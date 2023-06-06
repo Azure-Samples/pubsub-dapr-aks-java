@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: pubsub-dapr-aks-java
+hooks:
+  postprovision:
+    shell: sh
+    continueOnError: false
+    interactive: true
+    run: ./infra/dapr-install.sh
+services:
+  public-api-service:
+    project: ./src/public-api-service
+    language: java
+    host: aks
+  account-service:
+    project: ./src/account-service
+    language: java
+    host: aks
+  fraud-service:
+    project: ./src/fraud-service
+    language: java
+    host: aks
+  notification-service:
+    project: ./src/notification-service
+    language: java
+    host: aks

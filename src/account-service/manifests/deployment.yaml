@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "account-service"
+  labels:
+    app: "account-service"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "account-service"
+  template:
+    metadata:
+      labels:
+        app: "account-service"
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "account-service"
+        dapr.io/app-port: "8080"
+        dapr.io/enable-api-logging: "true"
+    spec:
+      containers:
+        - name: node
+          image: ${SERVICE_ACCOUNT_SERVICE_IMAGE_NAME}
+          ports:
+            - containerPort: 80
+          env:
+            - name: APP_PORT
+              value: "8080"
+            - name: APP_VERSION
+              value: "1.0.0"
+            - name: AZURE_CLIENT_ID
+              value: ${AZURE_AKS_IDENTITY_CLIENT_ID}
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "512m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"

@@ -1,0 +1,51 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/java
+{
+	"name": "Dapr sample",
+	"dockerFile": "Dockerfile",
+	
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "none",
+			"installMaven": "false",
+			"installGradle": "true"
+		},
+		"ghcr.io/devcontainers/features/azure-cli:1": {
+			"extensions": "k8s-extension"
+		},
+		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
+		"ghcr.io/mpriscella/features/kind:1": {},
+		"ghcr.io/devcontainers-contrib/features/redis-homebrew:1": {},
+		"ghcr.io/devcontainers-contrib/features/springboot-sdkman:2.0.10": {
+			"jdkVersion": "17"
+		},
+		"ghcr.io/dapr/cli/dapr-cli:0": {},
+		// We use d-in-d because we need overlay networks
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "java -version",
+
+	"customizations": {
+		"vscode": {
+			"extensions":[
+				"ms-azuretools.vscode-bicep",
+				"ms-azuretools.azure-dev",
+				"vscjava.vscode-java-pack",
+				"vmware.vscode-boot-dev-pack",
+				"vscjava.vscode-spring-boot-dashboard",
+				"github.copilot",
+				"ms-kubernetes-tools.vscode-kubernetes-tools",
+				"SonarSource.sonarlint-vscode"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

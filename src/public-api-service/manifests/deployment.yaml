@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "public-api-service"
+  labels:
+    app: "public-api-service"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "public-api-service"
+  template:
+    metadata:
+      labels:
+        app: "public-api-service"
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "public-api-service"
+        dapr.io/app-port: "8080"
+        dapr.io/enable-api-logging: "true"
+    spec:
+      containers:
+      - name: node
+        image: ${SERVICE_PUBLIC_API_SERVICE_IMAGE_NAME}
+        env:
+        - name: APP_PORT
+          value: "8080"
+        - name: APP_VERSION
+          value: "1.0.0"
+        - name: AZURE_CLIENT_ID
+          value: ${AZURE_AKS_IDENTITY_CLIENT_ID}
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "512m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"

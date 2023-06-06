@@ -1,13 +1,5 @@
-## [project-title] Changelog
+# Changelog
 
-<a name="x.y.z"></a>
-# x.y.z (yyyy-mm-dd)
+## 1.0.0 (2023-06-06)
 
-*Features*
-* ...
-
-*Bug Fixes*
-* ...
-
-*Breaking Changes*
-* ...
+Complete sample project

@@ -1,0 +1,52 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.9'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+/**
+ * app.jar is the archive produced by the bootJar task.
+ * This is a Spring Boot fat jar that contains all of the module's dependencies as well as its classes and resources.
+ * It can be run using java -jar.
+ * app-plain.jar is the archive produced by the jar task.
+ * This is a plain or standard jar file that contains only the module's classes and resources.
+ * You can learn a bit more about this in the documentation for Spring Boot's Gradle plugin.
+ */
+jar {
+	enabled = false
+}
+
+group = 'com.azd-aks'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Dapr's core SDK with all features, except Actors.
+	implementation 'io.dapr:dapr-sdk:1.7.1'
+
+	// Dapr's SDK integration with SpringBoot (optional).
+	implementation 'io.dapr:dapr-sdk-springboot:1.7.1'
+
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+
+	implementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

@@ -1,0 +1,33 @@
+plugins {
+    id("java")
+    id "application"
+}
+
+application {
+    mainClass = 'org.azdaks.test.e2e.Main'
+}
+
+group = "org.azdaks.test.e2e"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+
+    compileOnly("org.projectlombok:lombok:1.18.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.22")
+
+    implementation("com.fasterxml.jackson.core:jackson-core:2.13.4")
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.13.4')
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.13.4")
+
+    implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
