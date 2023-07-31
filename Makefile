@@ -29,24 +29,11 @@ deploy-local: ## 🚀 Deploy application resources locally
 	@./scripts/deploy-services-local.sh
 	@echo -e "\e[34mYOU WILL NEED TO START A NEW TERMINAL AND RUN  make test\e[0m" || true
 
-test-local: ## 🧪 Run tests locally
-	@echo -e "\e[34m$@\e[0m" || true
-	@cd test/e2e-test && ./gradlew run
-
 run-local: clean start-local deploy-local ## 💿 Run app locally
 
 port-forward-local: ## ⏩ Forward the local port
 	@echo -e "\e[34m$@\e[0m" || true
 	@kubectl port-forward service/public-api-service 8080:80 --pod-running-timeout=3m0s
-
-test: ## 🧪 Run tests, used for local development
-	@echo -e "\e[34m$@\e[0m" || true
-	@./scripts/test.sh
-
-clean: ## 🧹 Clean up local files
-	@echo -e "\e[34m$@\e[0m" || true
-	@kind delete cluster --name azd-aks
-	@docker rm kind-registry -f
 
 dapr-dashboard: ## 🔬 Open the Dapr Dashboard
 	@echo -e "\e[34m$@\e[0m" || true
@@ -56,7 +43,20 @@ dapr-components: ## 🏗️  List the Dapr Components
 	@echo -e "\e[34m$@\e[0m" || true
 	@dapr components -k
 
+test-local: ## 🧪 Run tests, used for local development
+	@echo -e "\e[34m$@\e[0m" || true
+	@./scripts/test.sh
+
+test-e2e: ## 🧪 Run end to end tests
+	@echo -e "\e[34m$@\e[0m" || true
+	@cd test/e2e-test && ./gradlew run
+
 ####### AZURE #############
 test-azure: ## 🧪 Run tests in Azure
 	@echo -e "\e[34m$@\e[0m" || true
 	@./scripts/test.sh --azure
+
+clean: ## 🧹 Clean up local files
+	@echo -e "\e[34m$@\e[0m" || true
+	@kind delete cluster --name azd-aks
+	@docker rm kind-registry -f
