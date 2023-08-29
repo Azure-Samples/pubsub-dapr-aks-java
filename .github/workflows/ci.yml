@@ -31,4 +31,4 @@ jobs:
       - name: Test
         run: |
           kubectl port-forward service/public-api-service 8080:80 --pod-running-timeout=3m0s &
-          make test-local
+          make test-e2e

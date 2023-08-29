@@ -1,0 +1,3 @@
+.gradle
+test/e2e-test/build/
+bin/
