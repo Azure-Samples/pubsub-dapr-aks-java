@@ -1,11 +1,16 @@
 #!/bin/sh
 
+set -o errexit
+
 serviceName="public-api-service"
 version=$(date +%Y.%m.%d.%H.%M.%S)
 printf "\n🛖  Releasing version: %s\n\n" "${version}"
 
-printf "\n☢️  Attempting to delete existing deployment %s\n\n" "${serviceName}"
-kubectl delete deployment "${serviceName}"
+# check if service deployment exists on cluster, deleting if it does
+if [ $(kubectl get deployments | grep -c "^${serviceName}") -eq "1" ]; then
+  printf "\n☢️  Attempting to delete existing deployment %s\n\n" "${serviceName}"
+  kubectl delete deployment "${serviceName}"
+fi
 
 printf "\n🏗️  Building docker image\n\n"
 docker build -t localhost:5001/"${serviceName}":"${version}" .

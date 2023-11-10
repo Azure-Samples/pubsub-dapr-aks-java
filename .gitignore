@@ -1,3 +1,8 @@
+.azure
 .gradle
 test/e2e-test/build/
 bin/
+src/account-service/build/
+src/fraud-service/build/
+src/public-api-service/build/
+src/notification-service/build/
