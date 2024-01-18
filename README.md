@@ -1,3 +1,19 @@
+---
+page_type: sample
+languages:
+- azdeveloper
+- java
+- bicep
+products:
+- azure
+- azure-kubernetes-service
+- dapr
+urlFragment: pubsub-dapr-aks-java
+name: Java Pub/Sub Sample using Kubernetes and DAPR
+description: Demonstrate a pub/sub messaging architecture using Dapr for a Java application running in a Kubernetes cluster. This sample project implements an event-driven communication between different components of the system using the pub/sub pattern. 
+---
+<!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
+
 # Java Pub/Sub Sample using Kubernetes and DAPR
 
 This sample is to demonstrate a pub/sub messaging architecture using Dapr for a Java application running in a Kubernetes cluster. This sample project implements an event-driven communication between different components of the system using the pub/sub pattern. By leveraging Dapr, this sample provides an asynchronous processing in a distributed system and application of side car pattern in a Kubernetes cluster. Whether you are new to event-driven architectures or looking to explore Dapr's capabilities for a Java application running in Kubernetes, this sample is a great place to start.
