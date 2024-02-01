@@ -7,7 +7,6 @@ languages:
 products:
 - azure
 - azure-kubernetes-service
-- dapr
 urlFragment: pubsub-dapr-aks-java
 name: Java Pub/Sub Sample using Kubernetes and DAPR
 description: Demonstrate a pub/sub messaging architecture using Dapr for a Java application running in a Kubernetes cluster. This sample project implements an event-driven communication between different components of the system using the pub/sub pattern. 
