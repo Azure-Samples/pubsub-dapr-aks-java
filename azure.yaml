@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
-
 name: pubsub-dapr-aks-java
 hooks:
   postprovision:
@@ -24,3 +22,5 @@ services:
     project: ./src/notification-service
     language: java
     host: aks
+metadata:
+  template: pubsub-dapr-aks-java@0.0.1-beta
