@@ -25,8 +25,15 @@ kubectl apply -f ./local/deployments/config-map.yaml --wait=true
 
 
 printf '\n📀 Deploy Redis\n\n'
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install redis -n default --set architecture=standalone bitnami/redis
+if ! kubectl --context kind-azd-aks get secret redis --namespace default >/dev/null 2>&1; then
+  redis_password=$(openssl rand -hex 32)
+  printf '%s' "$redis_password" | kubectl --context kind-azd-aks create secret generic redis --namespace default \
+    --from-file='redis-password'=/dev/stdin
+fi
+# Keep local Redis standalone; AKS also deploys the replica resources.
+kubectl --context kind-azd-aks apply -f ./infra/redis.yaml --namespace default \
+  --selector='app.kubernetes.io/component!=replica' --wait=true
+kubectl --context kind-azd-aks rollout status statefulset/redis-master --namespace default --timeout=300s
 
 printf '\n📀 Init Dapr\n\n'
 dapr init --kubernetes --wait --timeout 600

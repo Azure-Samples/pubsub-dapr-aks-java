@@ -28,7 +28,14 @@ if [ $(kubectl get namespaces | grep -c "^$AZURE_ENV_NAME ") -eq "0" ]; then
 fi 
 
 printf '\n🚀 Deploy Redis on AKS\n\n'
-kubectl apply -f ./infra/redis.yaml --namespace $AZURE_ENV_NAME --wait=true
+if ! kubectl get secret redis --namespace "$AZURE_ENV_NAME" >/dev/null 2>&1; then
+    redis_password=$(openssl rand -hex 32)
+    printf '%s' "$redis_password" | kubectl create secret generic redis --namespace "$AZURE_ENV_NAME" \
+        --from-file='redis-password'=/dev/stdin
+fi
+kubectl apply -f ./infra/redis.yaml --namespace "$AZURE_ENV_NAME" --wait=true
+kubectl rollout status statefulset/redis-master --namespace "$AZURE_ENV_NAME" --timeout=300s
+kubectl rollout status statefulset/redis-replicas --namespace "$AZURE_ENV_NAME" --timeout=300s
 
 printf '\n🚀 Deploy pub-sub broker component backed by Redis\n\n'
 kubectl apply -f ./local/components/pubsub.yaml --wait=true --namespace $AZURE_ENV_NAME

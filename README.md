@@ -100,7 +100,7 @@ This script runs the followings:
 1. Creates a Kind cluster called `azd-aks` using config file from [kind-cluster-config.yaml](/local/kind-cluster-config.yaml).
 1. Connects the registry to the cluster network if not already connected so deployments can access the local registry.
 1. Maps the local registry to the cluster
-1. Deploys [Redis](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/) to the cluster using [Helm](https://helm.sh/docs/intro/quickstart/) [chart](https://bitnami.com/stack/redis/helm) to use for different Dapr components (pub/sub, state store, etc).
+1. Deploys the [official Redis image](https://hub.docker.com/_/redis) using [redis.yaml](./infra/redis.yaml) for Dapr pub/sub and state storage. Local setup deploys only the primary; AKS also deploys three replicas. Setup requires OpenSSL to generate a password in the Kubernetes `redis` secret and preserves the secret on subsequent runs.
 1. Deploys [Dapr](https://docs.dapr.io/operations/hosting/kubernetes/kubernetes-deploy/) on your local cluster.
 1. Deploys [Pub/Sub Broker](https://docs.dapr.io/developing-applications/building-blocks/pubsub/pubsub-overview/) using Redis as the message broker using [redis.yaml](./local/components/redis.yaml) Dapr component.
 
@@ -340,6 +340,10 @@ make clean
 Following are practical operator guides for common tasks.
 
 ### How to Operate Redis
+
+Redis uses the official `redis:7.2.16-bookworm` image, not the retired Bitnami image catalog. The manifest retains the `redis-master:6379` endpoint, `redis` secret (`redis-password` key), non-root UID/GID 1001, and persistent volume names. Append-only persistence and password-authenticated health checks remain enabled.
+
+Before updating an existing deployment, back up Redis data and the secret. For an AKS deployment installed with the old manifest, rerun the post-provision hook (or the Redis deployment commands below); existing secrets and PVCs are retained. Do not uninstall Redis or delete its PVCs to migrate data. For a disposable local cluster previously installed with the Bitnami Helm chart, recreate the cluster with `make clean` and `make start-local` instead of mixing Helm-managed and manifest-managed resources. **Recreating the local cluster deletes its data.** Production deployments should use a managed Redis service or a separately operated Redis deployment.
 
 To connect to Redis, you can use the following command:
 
@@ -738,10 +742,17 @@ kube-public                           Active   122m
 kube-system                           Active   122m
 ```
 
-We are using an in-cluster Redis instance for the pub-sub and state store components. To deploy Redis, run the following command:
+We are using an in-cluster Redis instance for the pub-sub and state store components. Create a password only if the secret does not already exist, then deploy Redis and wait for readiness (OpenSSL is required):
 
 ```bash
-kubectl apply -f ./infra/redis.yaml --namespace $AZURE_ENV_NAME --wait=true
+if ! kubectl get secret redis --namespace "$AZURE_ENV_NAME" >/dev/null 2>&1; then
+    redis_password=$(openssl rand -hex 32) || exit 1
+    printf '%s' "$redis_password" | kubectl create secret generic redis --namespace "$AZURE_ENV_NAME" \
+        --from-file='redis-password'=/dev/stdin
+fi
+kubectl apply -f ./infra/redis.yaml --namespace "$AZURE_ENV_NAME" --wait=true
+kubectl rollout status statefulset/redis-master --namespace "$AZURE_ENV_NAME" --timeout=300s
+kubectl rollout status statefulset/redis-replicas --namespace "$AZURE_ENV_NAME" --timeout=300s
 ```
 
 You can check the Redis installation by running the following command:
