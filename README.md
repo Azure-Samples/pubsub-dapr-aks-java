@@ -96,7 +96,7 @@ make start-local
 
 This script runs the followings:
 
-1. Creates a local Docker registry called `kind-registry` running locally on port 9999.
+1. Creates a local Docker registry called `kind-registry` running locally on port 5001.
 1. Creates a Kind cluster called `azd-aks` using config file from [kind-cluster-config.yaml](/local/kind-cluster-config.yaml).
 1. Connects the registry to the cluster network if not already connected so deployments can access the local registry.
 1. Maps the local registry to the cluster
