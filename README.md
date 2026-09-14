@@ -343,7 +343,19 @@ Following are practical operator guides for common tasks.
 
 Redis uses the official `redis:7.2.16-bookworm` image, not the retired Bitnami image catalog. The manifest retains the `redis-master:6379` endpoint, `redis` secret (`redis-password` key), non-root UID/GID 1001, and persistent volume names. Append-only persistence and password-authenticated health checks remain enabled.
 
-Before updating an existing deployment, back up Redis data and the secret. For an AKS deployment installed with the old manifest, rerun the post-provision hook (or the Redis deployment commands below); existing secrets and PVCs are retained. Do not uninstall Redis or delete its PVCs to migrate data. For a disposable local cluster previously installed with the Bitnami Helm chart, recreate the cluster with `make clean` and `make start-local` instead of mixing Helm-managed and manifest-managed resources. **Recreating the local cluster deletes its data.** Production deployments should use a managed Redis service or a separately operated Redis deployment.
+Before updating an existing deployment, back up Redis data and the secret. For an AKS deployment installed with the old manifest, apply the new manifest, then recreate the Redis pods. This recovers StatefulSets whose old pods are stuck pulling the retired image or failing readiness; applying a new template alone can leave an ordered rollout blocked.
+
+```bash
+kubectl apply -f ./infra/redis.yaml --namespace "$AZURE_ENV_NAME" --wait=true
+kubectl delete pods --namespace "$AZURE_ENV_NAME" \
+    --selector='app.kubernetes.io/name=redis,app.kubernetes.io/instance=redis'
+kubectl rollout status statefulset/redis-master --namespace "$AZURE_ENV_NAME" --timeout=300s
+kubectl rollout status statefulset/redis-replicas --namespace "$AZURE_ENV_NAME" --timeout=300s
+```
+
+This causes a brief Redis outage but retains the existing secret and PVCs. Do not uninstall Redis or delete its PVCs to migrate data. Once Redis is ready, rerun the post-provision hook if it previously failed.
+
+For a disposable local cluster previously installed with the Bitnami Helm chart, recreate the cluster with `make clean` and `make start-local` instead of mixing Helm-managed and manifest-managed resources. **Recreating the local cluster deletes its data.** Production deployments should use a managed Redis service or a separately operated Redis deployment.
 
 To connect to Redis, you can use the following command:
 
